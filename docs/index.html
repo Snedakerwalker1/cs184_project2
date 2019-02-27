@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <style>
@@ -32,57 +32,294 @@
 <div>
 
 <h2 align="middle">Overview</h2>
-<p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
+<p>In this project I implemented a few algarithms to create different forms of smooth curves and surfaces. The first algarithm I implemented was de Casteljau's algorithm which takes a set of points and interpolates a smooth curve between the first an last of these points using all the other given points as reference to create specific curves. Then in the second part I exteneded this algarithm to a two dimensional surface creating smooth bezier surfaces. In the next secion I used the halfedge data structure to implement first a shading technique that uses the weighted normals of each face to more corectly shade our objects. Then I implemented edge flipping and edge spliting and combines them into subdivision that upsamples our surface creating smoother edges and more percise curves.</p>
 
 <h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
 
 <h3 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
 
-<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+<p>In this section of this project I implemended a version of de Casteljau's algorithm to create Bezier Curves. This Algorithm takes n points and a value t, the algorithm then linearly interpolates the center points between each of these points given the value t, returning the n-1 middle points. By recursively calling this algorithm we end up with a final point that follows a smoth curve from the first to final of the original n points as we adjust t from zero to one. This alows us to, using a finite number of points create any number of curved paths through space. The folowing is a six point interpolatd Bezier curve where the six and first points are practivaly overlaping and the other points are symetric. I chose this formation because it allows for a very visualy stimulating interpolation patern where each point is clearly visible.</p>
 
 <div align="middle">
   <table style="width=100%">
     <tr>
       <td>
-        <img src="images/image1.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
+        <img src="images/p1p10.png" align="middle" width="400px"/>
+        <figcaption align="middle">This is the basic image of the six original points.</figcaption>
       </td>
       <td>
-        <img src="images/image2.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
+        <img src="images/p1p11.png" align="middle" width="400px"/>
+        <figcaption align="middle">We have now interpolated the first layer getting 5 points.</figcaption>
       </td>
     </tr>
     <br>
     <tr>
       <td>
-        <img src="images/image3.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
+        <img src="images/p1p12.png" align="middle" width="400px"/>
+        <figcaption align="middle">Recursively interpolate getting 4 points.</figcaption>
       </td>
       <td>
-        <img src="images/image4.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
+        <img src="images/p1p13.png" align="middle" width="400px"/>
+        <figcaption align="middle">Once again recursively interpolate now getting 3 points.</figcaption>
+      </td>
+    </tr> 
+    <br>
+    <tr>
+      <td>
+        <img src="images/p1p14.png" align="middle" width="400px"/>
+        <figcaption align="middle">The penultimate interpolation getting 2 points.</figcaption>
+      </td>
+      <td>
+        <img src="images/p1p15.png" align="middle" width="400px"/>
+        <figcaption align="middle">We finish interpolating getting 1 point.</figcaption>
       </td>
     </tr>
+    <br>
+    <tr>
+      <td>
+        <img src="images/p1p16.png" align="middle" width="400px"/>
+        <figcaption align="middle">We finaly trace the curve our final points creates.</figcaption>
+      </td>
+      <td>
+        <img src="images/p1p17.png" align="middle" width="400px"/>
+        <figcaption align="middle">By adjusting the t value we move the points.</figcaption>
+      </td>
+    </tr> 
+    <br>
+    <tr>
+      <td>
+        <img src="images/p1p18.png" align="middle" width="400px"/>
+        <figcaption align="middle">We can move the points back and forth and as we see it moves all points we have interpolated.</figcaption>
+      </td>
+    </tr> 
   </table>
 </div>
 
 
 <h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
 
+<p>In this next section I expanded de Casteljau's algorithm to 2 dimensions by first finding all of the 1D Bezier curves given by our sets of sample points in the same u direction using a similar process to part one. Then taking the final points returned by running de Casteljau's algorithm on each of these lines and running de Casteljau's algorithm on these points in the v direction finding a point in space determined by our u and v inputs and sample points, and thus finding a smooth surface. Bellow is a few screanshots of surfaces created usign this algorithm.</p>
 
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/p2p0.png" align="middle" width="400px"/>
+        <figcaption align="middle">This is the output of teapot.bez.</figcaption>
+      </td>
+      <td>
+        <img src="images/p2p1.png" align="middle" width="400px"/>
+        <figcaption align="middle">This is a zoomed in version with the wire mesh feature turned on.</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
 
 <h2 align="middle">Section II: Sampling</h2>
 
 <h3 align="middle">Part 3: Average normals for half-edge meshes</h3>
 
+<p>In this section I implemented Average normals for the half-edge mesh object. These average normals allow us to create smother looking surfaces with interesting lighting. In my implementation this is done by finding the weighted average normal of each face that surounds our point p, that we wish to compute the average normal of, and finding the area weighted average of each of these normals giving us the normal at our wanted point. The average of each fase is calculated as the area-weighted normal, which is calculated by finding the normal at each of the faces verterxes and averaging them based on the area of the triangle. Thus by finding the normals of each face and calculating the weighted average of each of these normals we can find the average normals for each of the half edge meshes.</p>
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="images/p3p1.png" align="middle" width="400px" />
+                <figcaption align="middle">This is the default OpenGL shading output of teapot.dae.</figcaption>
+            </td>
+            <td>
+                <img src="images/p3p2.png" align="middle" width="400px" />
+                <figcaption align="middle">This is the output by using Q to swith to average vertex normals of teapot.dae.</figcaption>
+            </td>
+        </tr>
+        <br/>
+        <tr>
+            <td>
+                <img src="images/p3p3.png" align="middle" width="400px" />
+                <figcaption align="middle">This is the default shading with the wire mesh turned off.</figcaption>
+            </td>
+            <td>
+                <img src="images/p3p4.png" align="middle" width="400px" />
+                <figcaption align="middle">This is the average vertex normal shading with the wire mesh turned off.</figcaption>
+            </td>
+        </tr>
+    </table>
+</div>
 
 <h3 align="middle">Part 4: Half-edge flip</h3>
 
+<p>In this section I implemented Half-edge flipping. This is a system where given an edge we want to flip we find the verticis of the two triangle that neighbor said edge and flip the edge so that it attached the two vertecies it currently does not interact with in the two triangles that it is an edge of. This is done by finding all of the necesary pointers to all parts of the two triangles that contain the edge to be fliped. I then reasign the pointers to the new values that they have in the new structure. Since I mapped it out originaly by setting every single pointer, even thoughs that had little to no change I never ran into any bugs even with exaustive bug testing.</p>
 
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="images/p4p0.png" align="middle" width="400px" />
+                <figcaption align="middle">This is a zoomed in section of teapot.dae.</figcaption>
+            </td>
+            <td>
+                <img src="images/p4p1.png" align="middle" width="400px" />
+                <figcaption align="middle">After aplying multiple random edge flips this is what teapot.dae looks like.</figcaption>
+            </td>
+        </tr>
+        <br />
+        <tr>
+            <td>
+                <img src="images/p4p2.png" align="middle" width="400px" />
+                <figcaption align="middle">This is cube.dae file run.</figcaption>
+            </td>
+            <td>
+                <img src="images/p4p3.png" align="middle" width="400px" />
+                <figcaption align="middle">This is a now gem shaped image made by carfuly switching edges on the cube.dae file.</figcaption>
+            </td>
+        </tr>
+    </table>
+</div>
 <h3 align="middle">Part 5: Half-edge split</h3>
 
+<p>In this part I implemented edge spliting. Edge spliting takes a given, nonboundary edge of a mesh and adds a new vertex to the mesh in the middle of the edge. This new vertex is then attached to the graph by three new edges and the original edge by conecting this vertex with each of the vertexes that surounded the original edge. Through this process two new triangular faces are created on our mesh allowing new smooth curves to be represented.</p>
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="images/p5p3.png" align="middle" width="400px" />
+                <figcaption align="middle">This is a zoomed in section of teapot.dae.</figcaption>
+            </td>
+            <td>
+                <img src="images/p5p4.png" align="middle" width="400px" />
+                <figcaption align="middle">This is the same section now with split edges called near ten times on the area.</figcaption>
+            </td>
+        </tr>
+        <br />
+        <tr>
+            <td>
+                <img src="images/p5p0.png" align="middle" width="400px" />
+                <figcaption align="middle">This is the side of teapot.dae before splits and flips.</figcaption>
+            </td>
+            <td>
+                <img src="images/p5p1.png" align="middle" width="400px" />
+                <figcaption align="middle">This is teapot.dae after calling split edge and flip edge numerous times on both this face and the other.</figcaption>
+            </td>
+        </tr>
+        <br />
+        <tr>
+            <td>
+                <img src="images/p5p2.png" align="middle" width="400px" />
+                <figcaption align="middle">This is the other side of the teapot that also had split edge and flip edge called on multiple times.</figcaption>
+            </td>
+        </tr>
+    </table>
+</div>
 
 <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
+
+<p>In this final section I implemented Loop subdivision for mesh upsampling. This is done in a multistep process that starts by first finding the new position for each of the verticies that are currently in the mesh, then iterating over the edges and finding the position for the verticies we are going to add to the mesh in the next step. In the next step I iterate through all of the edges that were in the mesh before this step and split each edge adding a new vetex in the center of each edge and two new edges around said new vertex using my function from part 5. Next I iterate though the new edges and flip every new edge that conects an old vertex from befor I split each edge to a new vertex from after the split. Finaly I iterate through all of the vertexes and set them to there new positions that I calculated at the start of this algorithm. Now lets look at how loop subdivision afects sharp corners and edges and how pre-spliting some edges effects this process. To start we look at the Cube.bae file and run subdivision of the cube once.</p>
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="images/p6p0.png" align="middle" width="400px" />
+                <figcaption align="middle">Before.</figcaption>
+            </td>
+            <td>
+                <img src="images/p6p1.png" align="middle" width="400px" />
+                <figcaption align="middle">After.</figcaption>
+            </td>
+        </tr>
+    </table>
+</div>
+<p>As we can see from the before and after pictures above the cube sharp solid edges and corners are greately smoothed out forming more of a ball after just one call of the funciton. An even more interesting effect occurs if we split some of the edges before. As can be seen below if we presplit some of the edges our end result is a much less uniform ball that is much smother in the area of higher concentraition of split edges.</p>
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="images/p6p2.png" align="middle" width="400px" />
+                <figcaption align="middle">We know split edges on the visable faces.</figcaption>
+            </td>
+            <td>
+                <img src="images/p6p3.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision on the split edge cube.</figcaption>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<p>Finaly we see that if we run loop subdivision on the cube as it is given multiple times our cube becomes less and less symetric, as can be seen in the images below. This comes from the fact that out original triangles that make up each face of the cube are not symetrie, since they are equalateral triangles. This causes each corner to be adjusted slightly differently than its neighbors causing this uneveness. If we presplit every face edge of our cube we create a mush more symetric cube, which when upsampled yeilds a much more symetric surface as seen below. In actuality any scheme of flipping or splitting edges that causes the cube to have more symetry at the start will cause the upsampled product to be more symetric. This can be seen by the final set of edges where the faces of each edge were permuted to make two "great triangles" across the faces such that the unseen faces and the unseen vertex have the exact same patern of face edges as seen in the visable part of the cube. As seen this slight addition of symetry also forms a much more symetric upsamples product.</p>
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="images/p6p4.png" align="middle" width="400px" />
+                <figcaption align="middle">Our cube.bae file.</figcaption>
+            </td>
+            <td>
+                <img src="images/p6p5.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision once.</figcaption>
+            </td>
+        </tr>
+        <br />
+        <tr>
+            <td>
+                <img src="images/p6p6.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision twice.</figcaption>
+            </td>
+            <td>
+                <img src="images/p6p7.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision a third time.</figcaption>
+            </td>
+        </tr>
+        <br />
+        <tr>
+            <td>
+                <img src="images/p6p8.png" align="middle" width="400px" />
+                <figcaption align="middle">Our cube.bae file now with the faces presplit.</figcaption>
+            </td>
+            <td>
+                <img src="images/p6p9.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision once after spliting.</figcaption>
+            </td>
+        </tr>
+        <br />
+        <tr>
+            <td>
+                <img src="images/p6p10.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision twice after spliting.</figcaption>
+            </td>
+            <td>
+                <img src="images/p6p11.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision a third time after spliting.</figcaption>
+            </td>
+        </tr>
+        <br />
+        <tr>
+            <td>
+                <img src="images/p6p12.png" align="middle" width="400px" />
+                <figcaption align="middle">Our cube.bae file now with the faces fliped to a more symetric pattern.</figcaption>
+            </td>
+            <td>
+                <img src="images/p6p13.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision once after fliping for symetr.</figcaption>
+            </td>
+        </tr>
+        <br />
+        <tr>
+            <td>
+                <img src="images/p6p14.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision twice after fliping for symetry.</figcaption>
+            </td>
+            <td>
+                <img src="images/p6p15.png" align="middle" width="400px" />
+                <figcaption align="middle">After running loop subdivision a third time after fliping for symetr.</figcaption>
+            </td>
+        </tr>
+    </table>
+</div>
+
 
 <h2 align="middle">Section III: Mesh Competition</h2>
 <p>If you are not participating in the optional mesh competition, don't worry about this section!</p>
